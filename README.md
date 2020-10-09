@@ -21,6 +21,10 @@ website of Deutsche Post - more information can be found on the website
 To register, you need a valid [TRIGGERDIALOG Client ID](#before-start), 
 which is provided in the Mautic settings after installing this bundle.
 
+####Breaking Changes
+If you need to use this plugin for a Mautic-2.x-Installation you need to download the 
+Version-Release 1.x of this plugin.
+
 ## Installation
 
 To install the plugin for Mautic, the following steps are necessary 

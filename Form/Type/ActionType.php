@@ -52,7 +52,7 @@ class ActionType extends AbstractType
             ],
             'constraints' => [
                 new NotBlank(
-                    ['message' => 'todo.add.me']
+                    ['message' => 'plugin.triggerdialog.campaign.action.error']
                 ),
             ],
         ]);
