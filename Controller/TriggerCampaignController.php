@@ -310,6 +310,14 @@ class TriggerCampaignController extends AbstractFormController
             return false;
         }
 
+        if (!$coreParametersHelper->has('triggerdialog_masSecret') || empty($coreParametersHelper->get('triggerdialog_masSecret'))) {
+            return false;
+        }
+
+        if (!$coreParametersHelper->has('triggerdialog_masId') || empty($coreParametersHelper->get('triggerdialog_masId'))) {
+            return false;
+        }
+
         return true;
     }
 
