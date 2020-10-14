@@ -9,7 +9,7 @@ use MauticPlugin\MauticTriggerdialogBundle\Utility\SsoUtility;
 
 class TriggerdialogService
 {
-    const AUDIENCE = 'https://dm.deutschepost.de/gateway/partnersystemfacade';
+    const AUDIENCE = 'https://dm-uat.deutschepost.de/gateway/partnersystemfacade';
 
     const TEST_AUDIENCE = 'https://dm-uat.deutschepost.de/gateway/partnersystemfacade';
 
@@ -97,8 +97,9 @@ class TriggerdialogService
 
         $response = $this->client->request(
             'PUT',
-            '/rest-mas/campaign/',
+            '/campaign',
             [
+                'debug' => true,
                 'body' => $xml->asXML(),
                 'headers' => [
                     'Authorization' => "Bearer {$this->bearerToken}"
@@ -128,7 +129,7 @@ class TriggerdialogService
 
         $response = $this->client->request(
             'POST',
-            '/rest-mas/campaign/',
+            '/campaign',
             [
                 'body' => $xml->asXML(),
                 'headers' => [
@@ -228,7 +229,7 @@ class TriggerdialogService
     protected function getCampaignData(TriggerCampaign $triggerCampaign, $getFullData = true)
     {
         $data = [
-            'masID' => $this->masId,
+            'masID' => (int)$this->masId,
             'masCampaignID' => $triggerCampaign->getId(),
             'masClientID' => $this->masClientId,
         ];

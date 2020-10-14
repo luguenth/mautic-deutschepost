@@ -22,7 +22,6 @@ class ConfigType extends AbstractType
             'attr' => [
                 'class' => 'form-control',
                 'rows' => '6',
-                'readonly' => 'readonly',
             ],
         ]);
 
