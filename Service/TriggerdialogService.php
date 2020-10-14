@@ -9,9 +9,9 @@ use MauticPlugin\MauticTriggerdialogBundle\Utility\SsoUtility;
 
 class TriggerdialogService
 {
-    const AUDIENCE = 'https://login.triggerdialog.de/';
+    const AUDIENCE = 'https://dm.deutschepost.de/gateway/partnersystemfacade';
 
-    const TEST_AUDIENCE = 'https://triggerdialog-uat.dhl.com/';
+    const TEST_AUDIENCE = 'https://dm-uat.deutschepost.de/gateway/partnersystemfacade';
 
     /**
      * @var self
@@ -34,6 +34,11 @@ class TriggerdialogService
     protected $masClientId;
 
     /**
+     * @var string
+     */
+    protected $bearerToken;
+
+    /**
      * @var array
      */
     protected $config = [
@@ -54,6 +59,7 @@ class TriggerdialogService
     {
         $audience = MAUTIC_ENV === 'prod' ? self::AUDIENCE : self::TEST_AUDIENCE;
         $config = $config + $this->config + ['base_uri' => $audience];
+        $this->bearerToken = base64_encode($config['auth'][0] . ":" . $config['auth'][1]);
         $this->client = new Client($config);
         $this->masId = $masId;
         $this->masClientId = $masClientId;
@@ -89,7 +95,16 @@ class TriggerdialogService
         $xml = new \SimpleXMLElement('<createCampaignRequest xmlns:ns2="urn:pep-dpdhl-com:triggerdialog/campaign/v_10"></createCampaignRequest>');
         $this->transformData($xml, $data);
 
-        $response = $this->client->request('PUT', '/rest-mas/campaign/', ['body' => $xml->asXML()]);
+        $response = $this->client->request(
+            'PUT',
+            '/rest-mas/campaign/',
+            [
+                'body' => $xml->asXML(),
+                'headers' => [
+                    'Authorization' => "Bearer {$this->bearerToken}"
+                ]
+            ]
+        );
 
         if ($response->getStatusCode() !== 200) {
             throw new RequestException($response, 1569423229);
@@ -111,7 +126,16 @@ class TriggerdialogService
         $xml = new \SimpleXMLElement('<updateCampaignRequest xmlns:ns2="urn:pep-dpdhl-com:triggerdialog/campaign/v_10"></updateCampaignRequest>');
         $this->transformData($xml, $data);
 
-        $response = $this->client->request('POST', '/rest-mas/campaign/', ['body' => $xml->asXML()]);
+        $response = $this->client->request(
+            'POST',
+            '/rest-mas/campaign/',
+            [
+                'body' => $xml->asXML(),
+                'headers' => [
+                    'Authorization' => "Bearer {$this->bearerToken}"
+                ]
+            ]
+        );
 
         if ($response->getStatusCode() !== 200) {
             throw new RequestException($response, 1569423229);
@@ -137,7 +161,16 @@ class TriggerdialogService
         $xml = new \SimpleXMLElement('<updateCampaignVariableRequest xmlns:ns2="urn:pep-dpdhl-com:triggerdialog/campaign/v_10"></updateCampaignVariableRequest>');
         $this->transformData($xml, $data);
 
-        $response = $this->client->request('POST', '/rest-mas/variabledefinitions/', ['body' => $xml->asXML()]);
+        $response = $this->client->request(
+            'POST',
+            '/rest-mas/variabledefinitions/',
+            [
+                'body' => $xml->asXML(),
+                'headers' => [
+                    'Authorization' => "Bearer {$this->bearerToken}"
+                ]
+            ]
+        );
 
         if ($response->getStatusCode() !== 200) {
             throw new RequestException($response, 1569423193);
@@ -170,7 +203,16 @@ class TriggerdialogService
         $xml = new \SimpleXMLElement('<createCampaignTriggerRequest xmlns:ns2="urn:pep-dpdhl-com:triggerdialog/campaign/v_10"></createCampaignTriggerRequest>');
         $this->transformData($xml, $data);
 
-        $response = $this->client->request('POST', '/rest-mas/trigger/', ['body' => $xml->asXML()]);
+        $response = $this->client->request(
+            'POST',
+            '/rest-mas/trigger/',
+            [
+                'body' => $xml->asXML(),
+                'headers' => [
+                    'Authorization' => "Bearer {$this->bearerToken}"
+                ]
+            ]
+        );
 
         if ($response->getStatusCode() !== 200) {
             throw new RequestException($response, 1569423375);
