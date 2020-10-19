@@ -9,9 +9,9 @@ use MauticPlugin\MauticTriggerdialogBundle\Utility\SsoUtility;
 
 class TriggerdialogService
 {
-    const AUDIENCE = 'https://dm-uat.deutschepost.de/gateway/partnersystemfacade';
+    const AUDIENCE = 'https://dm-uat.deutschepost.de/';
 
-    const TEST_AUDIENCE = 'https://dm-uat.deutschepost.de/gateway/partnersystemfacade';
+    const TEST_AUDIENCE = 'https://dm-uat.deutschepost.de/';
 
     /**
      * @var self
@@ -60,6 +60,7 @@ class TriggerdialogService
         $audience = MAUTIC_ENV === 'prod' ? self::AUDIENCE : self::TEST_AUDIENCE;
         $config = $config + $this->config + ['base_uri' => $audience];
         $this->bearerToken = base64_encode($config['auth'][0] . ":" . $config['auth'][1]);
+        unset($config['auth']);
         $this->client = new Client($config);
         $this->masId = $masId;
         $this->masClientId = $masClientId;
@@ -92,22 +93,28 @@ class TriggerdialogService
         $data = $this->getCampaignData($triggerCampaign);
         $data['variable'] = $triggerCampaign->getVariablesAsArray();
 
-        $xml = new \SimpleXMLElement('<createCampaignRequest xmlns:ns2="urn:pep-dpdhl-com:triggerdialog/campaign/v_10"></createCampaignRequest>');
+        $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><createCampaignRequest xmlns:ns2="urn:pep-dpdhl-com:triggerdialog/campaign/v_10"></createCampaignRequest>');
         $this->transformData($xml, $data);
+        $xml_req = $xml->asXML();
+        $xml_req = str_replace("createCampaignRequest", 'ns2:createCampaignRequest', $xml_req);
 
         $response = $this->client->request(
             'PUT',
-            '/campaign',
+            '/gateway/partnersystemfacade/campaign',
             [
                 'debug' => true,
-                'body' => $xml->asXML(),
+                'body' => $xml_req,
                 'headers' => [
-                    'Authorization' => "Bearer {$this->bearerToken}"
+                    'Authorization' => $this->bearerToken,
+                    'Content-Type' => "application/xml"
                 ]
             ]
         );
 
+        $response_req = $response->getBody()->getContents();
+
         if ($response->getStatusCode() !== 200) {
+
             throw new RequestException($response, 1569423229);
         }
     }
